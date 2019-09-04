@@ -88,24 +88,16 @@ Ray支持任意Python函数异步执行。这些异步的Ray函数被称为"远�
 
   - 在第一个任务执行完成以前，第二个任务将不会被执行，因为第二个任务取决于第一个任务的输出。
   - 如果在不同的机器上安排两个任务，则第一个任务的输出（对应的值 ``x1_id``）将通过网络发送到第二个任务的机器。
-  
-经常地，您可能希望指定任务的资源需求（例如，一个任务可能需要GPU）。``ray.init()`` 命令可能会自动检测到可用的机器上的GPU和CPU。然而，你可以使用传递一些特定资源参数重写这个默认项，例如``ray.init(num_cpus=8, num_gpus=4, resources={'Custom': 2})``.
 
-To specify a task's CPU and GPU requirements, pass the ``num_cpus`` and
-``num_gpus`` arguments into the remote decorator. The task will only run on a
-machine if there are enough CPU and GPU (and other custom) resources available
-to execute the task. Ray can also handle arbitrary custom resources.
+经常地，您可能希望指定任务的资源需求（例如，一个任务可能需要GPU）。``ray.init()`` 命令可能会自动检测到可用的机器上的GPU和CPU。然而，你可以使用传递一些特定资源参数重写这个默认项，例如 ``ray.init(num_cpus=8, num_gpus=4, resources={'Custom': 2})``.
 
-.. note::
+要指定一个task的CPU和GPU资源，传递 ``num_cpus`` 和 ``num_gpus`` 参数给远程装饰器。这个task会只在一台机器上运行如果那里有足够的CPU和GPU（以及其他的特定）资源可用。Ray也处理任意自定义资源。
 
-    * If you do not specify any resources in the ``@ray.remote`` decorator, the
-      default is 1 CPU resource and no other resources.
-    * If specifying CPUs, Ray does not enforce isolation (i.e., your task is
-      expected to honor its request.)
-    * If specifying GPUs, Ray does provide isolation in forms of visible devices
-      (setting the environment variable ``CUDA_VISIBLE_DEVICES``), but it is the
-      task's responsibility to actually use the GPUs (e.g., through a deep
-      learning framework like TensorFlow or PyTorch).
+.. 注意::
+
+    * 如果未在 ``@ray.remote`` 装饰器里指定任何资源，则默认值为1个CPU资源，不包含其他的资源。
+    * 如果指定GPU， Ray不会强制事务隔离（例如，你的task需要遵守它的请求）
+    * 如果指定GPU，Ray确实以事务隔离的形式提供可见的设备（设置环境变量 ``CUDA_VISIBLE_DEVICES``），但是实际使用GPU是task的责任（例如，通过像Tensorflow或者PyTorch这样的深度学习框架进行使用。）
 
 .. code-block:: python
 
@@ -113,27 +105,23 @@ to execute the task. Ray can also handle arbitrary custom resources.
   def f():
       return 1
 
-The resource requirements of a task have implications for the Ray's scheduling
-concurrency. In particular, the sum of the resource requirements of all of the
-concurrently executing tasks on a given node cannot exceed the node's total
-resources.
+一个task的资源需求对Ray的调度并发性是有影响的。特别的，在一个节点上，所有正在执行的任务的总资源需求不能超过这个节点的总资源。
 
-Below are more examples of resource specifications:
-
+如下有更多的资源指定的示例
 .. code-block:: python
 
-  # Ray also supports fractional resource requirements
+  # Ray 也支持很小的部分的资源需求
   @ray.remote(num_gpus=0.5)
   def h():
       return 1
 
-  # Ray support custom resources too.
+  # Ray 也支持自定义Custom资源
   @ray.remote(resources={'Custom': 1})
   def f():
       return 1
 
 Further, remote function can return multiple object IDs.
-
+此外，远程函数可以返回多个对象ID
 .. code-block:: python
 
   @ray.remote(num_return_vals=3)
