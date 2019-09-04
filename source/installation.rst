@@ -1,27 +1,24 @@
-Installing Ray
+安装Ray
 ==============
 
-Ray supports Python 2 and Python 3 as well as MacOS and Linux. Windows support
-is planned for the future.
 
-Latest stable version
+Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已在计划中。··
+
+最新的稳定版本
 ---------------------
 
-You can install the latest stable version of Ray as follows.
-
+你可以照以下方法安装Ray最新的稳定版本
 .. code-block:: bash
 
   pip install -U ray  # also recommended: ray[debug]
 
-Latest Snapshots (Nightlies)
+最新的快照版（Nightlies）
 ----------------------------
 
-Here are links to the latest wheels (which are built for each commit on the
-master branch). To install these wheels, run the following command:
-
+这里有一些最新的wheels的链接（他们是在master分支上的提交进行编译的），为了安装这些，可运行命令如下：
 .. code-block:: bash
 
-  pip install -U [link to wheel]
+  pip install -U [wheel的链接]
 
 
 ===================  ===================
@@ -43,23 +40,24 @@ master branch). To install these wheels, run the following command:
 .. _`MacOS Python 3.5`: https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-0.8.0.dev4-cp35-cp35m-macosx_10_6_intel.whl
 .. _`MacOS Python 2.7`: https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-0.8.0.dev4-cp27-cp27m-macosx_10_6_intel.whl
 
-Building Ray from Source
+
+从源码编译Ray
 ------------------------
 
-Installing from ``pip`` should be sufficient for most Ray users.
 
-However, should you need to build from source, follow instructions below for both Linux and MacOS.
+对大多数用户来说，pip安装是最高效的
 
-Dependencies
+然而，你需要从源码编译的话，可遵循下列指导，Linux和MacOS都适用。
+
+依赖
 ~~~~~~~~~~~~
 
-To build Ray, first install the following dependencies. We recommend using
+为了编译Ray, 首先请安装下列的依赖。我们推荐使用
 `Anaconda`_.
 
 .. _`Anaconda`: https://www.continuum.io/downloads
 
-For Ubuntu, run the following commands:
-
+对于Ubuntu，可以运行下列命令：
 .. code-block:: bash
 
   sudo apt-get update
@@ -71,7 +69,7 @@ For Ubuntu, run the following commands:
 
   pip install cython==0.29.0
 
-For MacOS, run the following commands:
+针对MacOS，运行下列命令：
 
 .. code-block:: bash
 
@@ -81,18 +79,15 @@ For MacOS, run the following commands:
   pip install cython==0.29.0
 
 
-If you are using Anaconda, you may also need to run the following.
-
+如果你正在使用Anaconda，你也许同时需要下列：
 .. code-block:: bash
 
   conda install libgcc
 
-
-Install Ray
+安装Ray
 ~~~~~~~~~~~
 
-Ray can be built from the repository as follows.
-
+Ray也可以从源包中编译，如下。
 .. code-block:: bash
 
   git clone https://github.com/ray-project/ray.git
@@ -103,33 +98,30 @@ Ray can be built from the repository as follows.
   cd ray/python
   pip install -e . --verbose  # Add --user if you see a permission denied error.
 
-Docker Source Images
+
+Docker源镜像
 --------------------
 
-Run the script to create Docker images.
-
+运行脚本创建Docker镜像
 .. code-block:: bash
 
   cd ray
   ./build-docker.sh
 
 This script creates several Docker images:
+这个脚本创建了几个Docker镜像
+- ``ray-project/deploy``镜像是一个源码和安装文件完备的拷贝，适合终端用户。
+- The ``ray-project/examples`` 添加了附加的文件去运行示例。
+- ``ray-project/base-deps`` 镜像是为了Ubuntu Xenial创建的，包含了Anaconda和其他的基础依赖，开发者可以以此为基础开始开发。
 
-- The ``ray-project/deploy`` image is a self-contained copy of code and binaries
-  suitable for end users.
-- The ``ray-project/examples`` adds additional libraries for running examples.
-- The ``ray-project/base-deps`` image builds from Ubuntu Xenial and includes
-  Anaconda and other basic dependencies and can serve as a starting point for
-  developers.
-
-Review images by listing them:
+可以列出镜像从而查看：
 
 .. code-block:: bash
 
   docker images
 
-Output should look something like the following:
 
+输出看起来应该像如下所示：
 .. code-block:: bash
 
   REPOSITORY                          TAG                 IMAGE ID            CREATED             SIZE
@@ -139,56 +131,53 @@ Output should look something like the following:
   ubuntu                              xenial              f49eec89601e        3 weeks ago         129.5 MB
 
 
-Launch Ray in Docker
+
+在Docker中运行Ray
 ~~~~~~~~~~~~~~~~~~~~
 
-Start out by launching the deployment container.
 
+开始从运行环境创建container.
 .. code-block:: bash
 
   docker run --shm-size=<shm-size> -t -i ray-project/deploy
 
-Replace ``<shm-size>`` with a limit appropriate for your system, for example
-``512M`` or ``2G``. The ``-t`` and ``-i`` options here are required to support
-interactive use of the container.
 
-**Note:** Ray requires a **large** amount of shared memory because each object
-store keeps all of its objects in shared memory, so the amount of shared memory
-will limit the size of the object store.
+使用一些合适的限制量，填到`<shm-size>``，例如``512M``、``2G``。为了支持交互式操作， ``-t``  ``-i`` 的选项是需要的。
 
-You should now see a prompt that looks something like:
+**注意** Ray需要**大量**的内存因为每个对象要在内存里存储他所有的对象，所以内存容量会限制对象存储的量。
+
+你现在应该看到有一些提示看起来像：
 
 .. code-block:: bash
 
   root@ebc78f68d100:/ray#
 
 Test if the installation succeeded
+测试安装是否成功
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To test if the installation was successful, try running some tests. This assumes
-that you've cloned the git repository.
 
+为了测试安装成功了，可以尝试运行一些试验，这里假设你已克隆了git资源库。
 .. code-block:: bash
 
   python -m pytest -v python/ray/tests/test_mini.py
 
 
-Troubleshooting installing Arrow
+
+安装Arrow故障排除
 --------------------------------
 
-Some candidate possibilities.
 
-You have a different version of Flatbuffers installed
+一些可能的情况
+
+你安装了Flatbuffers的一个不同的版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Arrow pulls and builds its own copy of Flatbuffers, but if you already have
-Flatbuffers installed, Arrow may find the wrong version. If a directory like
-``/usr/local/include/flatbuffers`` shows up in the output, this may be the
-problem. To solve it, get rid of the old version of flatbuffers.
+Arrow 拉取创建它的Flatbuffers拷贝，但是你已经有Flatbuffers安装了，因此Arrow有可能找到错误的版本。
+如果有个文件夹如``/usr/local/include/flatbuffers``在输出里出现，有可能是这个问题。为了解决它，要解决掉旧版本的flatbuffers。
 
-There is some problem with Boost
+这是一些Boost的问题
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a message like ``Unable to find the requested Boost libraries`` appears when
-installing Arrow, there may be a problem with Boost. This can happen if you
-installed Boost using MacPorts. This is sometimes solved by using Brew instead.
+如果有个信息像``Unable to find the requested Boost libraries``出现了，这里可能会有个Boost问题出现，如果你使用MacPorts安装Boost，这个问题可能会发生。
+这个情况可以改用Brew解决
