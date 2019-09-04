@@ -2,12 +2,13 @@
 ==============
 
 
-Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已在计划中。··
+Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已在计划中。
 
 最新的稳定版本
 ---------------------
 
 你可以照以下方法安装Ray最新的稳定版本
+
 .. code-block:: bash
 
   pip install -U ray  # also recommended: ray[debug]
@@ -16,6 +17,7 @@ Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已
 ----------------------------
 
 这里有一些最新的wheels的链接（他们是在master分支上的提交进行编译的），为了安装这些，可运行命令如下：
+
 .. code-block:: bash
 
   pip install -U [wheel的链接]
@@ -114,7 +116,8 @@ Docker源镜像
 
 
 这个脚本创建了几个Docker镜像
-- ``ray-project/deploy``镜像是一个源码和安装文件完备的拷贝，适合终端用户。
+
+- ``ray-project/deploy`` 镜像是一个源码和安装文件完备的拷贝，适合终端用户。
 - ``ray-project/examples`` 添加了附加的文件去运行示例。
 - ``ray-project/base-deps`` 镜像是为了Ubuntu Xenial创建的，包含了Anaconda和其他的基础依赖，开发者可以以此为基础开始开发。
 
@@ -150,7 +153,7 @@ Docker源镜像
 
 使用一些合适的限制量，填到`<shm-size>``，例如``512M``、``2G``。为了支持交互式操作， ``-t``  ``-i`` 的选项是需要的。
 
-**注意** Ray需要**大量**的内存因为每个对象要在内存里存储他所有的对象，所以内存容量会限制对象存储的量。
+**注意** Ray需要 **大量** 的内存因为每个对象要在内存里存储他所有的对象，所以内存容量会限制对象存储的量。
 
 你现在应该看到有一些提示看起来像：
 
@@ -158,7 +161,7 @@ Docker源镜像
 
   root@ebc78f68d100:/ray#
 
-Test if the installation succeeded
+
 测试安装是否成功
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,11 +183,11 @@ Test if the installation succeeded
 你安装了Flatbuffers的一个不同的版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Arrow 拉取创建它的Flatbuffers拷贝，但是你已经有Flatbuffers安装了，因此Arrow有可能找到错误的版本。
-如果有个文件夹如``/usr/local/include/flatbuffers``在输出里出现，有可能是这个问题。为了解决它，要解决掉旧版本的flatbuffers。
+Arrow 会拉取创建它的Flatbuffers拷贝，但是你已经有Flatbuffers安装了，因此Arrow有可能找到错误的版本。
+如果有个文件夹如 ``/usr/local/include/flatbuffers`` 在输出里出现，有可能是这个问题。为了解决它，要解决掉旧版本的flatbuffers。
 
-这是一些Boost的问题
+一些Boost的问题
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-如果有个信息像``Unable to find the requested Boost libraries``出现了，这里可能会有个Boost问题出现，如果你使用MacPorts安装Boost，这个问题可能会发生。
-这个情况可以改用Brew解决
+如果有个信息像 ``Unable to find the requested Boost libraries`` 出现了，这里可能会有个Boost问题出现，如果你使用MacPorts安装Boost，这个问题可能会发生。
+这个情况可以改用Brew解决。

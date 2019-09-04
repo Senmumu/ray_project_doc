@@ -1,14 +1,12 @@
-Walkthrough
+演示
 ===========
 
-This walkthrough will overview the core concepts of Ray:
+本演练将概述Ray的核心概念：
+1.使用远程函数（tasks）[``ray.remote``]
+2.获取结果（object IDs）[``ray.put``, ``ray.get``, ``ray.wait``]
+3.使用远程对象 (actors) [``ray.remote``]
 
-1. Using remote functions (tasks) [``ray.remote``]
-2. Fetching results (object IDs) [``ray.put``, ``ray.get``, ``ray.wait``]
-3. Using remote classes (actors) [``ray.remote``]
-
-With Ray, your code will work on a single machine and can be easily scaled to a
-large cluster. To run this walkthrough, install Ray with ``pip install -U ray``.
+使用Ray，你的代码将可以在单台机器上运行，也可以轻松轻松扩展到很大的集群。为了运行这个演示，使用 ``pip install -U ray`` 安装Ray.
 
 .. code-block:: python
 
@@ -18,17 +16,16 @@ large cluster. To run this walkthrough, install Ray with ``pip install -U ray``.
   # ray.init(address=<cluster-address>) instead.
   ray.init()
 
-See the `Configuration <configure.html>`__ documentation for the various ways to
-configure Ray. To start a multi-node Ray cluster, see the `cluster setup page
-<using-ray-on-a-cluster.html>`__. You can stop ray by calling
-``ray.shutdown()``. To check if Ray is initialized, you can call
-``ray.is_initialized()``.
+有关配置Ray的各种方法，请参阅`配置文档 <configure.html>`__。要启动多节点Ray群集，请参阅 `群集设置页面
+<using-ray-on-a-cluster.html>`__.。你可以通过调用 ``ray.shutdown()`` 来停止Ray。要检查Ray是否已初始化，你您可以调用``ray.is_initialized()``。
 
-Remote functions (Tasks)
+
+远程函数 （Tasks）
 ------------------------
 
-Ray enables arbitrary Python functions to be executed asynchronously. These asynchronous Ray functions are called "remote functions". The standard way to turn a Python function into a remote function is to add the ``@ray.remote`` decorator. Here is an example.
 
+Ray支持任意Python函数异步执行。这些异步的Ray函数被称为"远程函数"。将Python函数转变成远程函数的标准方法是添加一个装饰器 ``@ray.remote`` 。这里有个示例。
+ 
 .. code:: python
 
     # A regular Python function.
@@ -40,10 +37,9 @@ Ray enables arbitrary Python functions to be executed asynchronously. These asyn
     def remote_function():
         return 1
 
-This causes a few things changes in behavior:
-
-    1. **Invocation:** The regular version is called with ``regular_function()``, whereas the remote version is called with ``remote_function.remote()``.
-    2. **Return values:** ``regular_function`` immediately executes and returns ``1``, whereas ``remote_function`` immediately returns an object ID (a future) and then creates a task that will be executed on a worker process. The result can be retrieved with ``ray.get``.
+这样可以造成一些表现变化：
+    1. **调用：** 常规做法是使用 ``regular_function()`` 调用，而远程的版本是使用 ``remote_function.remote()`` 调用。
+    2. **返回值：** ``regular_function``立即执行返回 ``1``, 而 ``remote_function`` 立即返回有个对象ID然后创建一个任务并会在一个worker进程上执行，这个结果可以使用``ray.get`` 获取。
 
     .. code:: python
 
@@ -54,8 +50,7 @@ This causes a few things changes in behavior:
         # The value of the original `regular_function`
         assert ray.get(object_id) == 1
 
-3. **Parallelism:** Invocations of ``regular_function`` happen
-   **serially**, for example
+3. **并行性:**  ``regular_function`` **接连** 调用, 例如
 
    .. code:: python
 
@@ -63,8 +58,7 @@ This causes a few things changes in behavior:
        for _ in range(4):
            regular_function()
 
-   whereas invocations of ``remote_function`` happen in **parallel**,
-   for example
+   而 ``remote_function`` 的调用 **并行**发生,例如
 
    .. code:: python
 
@@ -72,9 +66,9 @@ This causes a few things changes in behavior:
        for _ in range(4):
            remote_function.remote()
 
-See the `ray.remote package reference <package-ref.html>`__ page for specific documentation on how to use ``ray.remote``.
+有关如何使用``ray.remote``的详细文档，可查看 `ray.remote包参考 <package-ref.html>`__ 页。
 
-**Object IDs** can also be passed into remote functions. When the function actually gets executed, **the argument will be a retrieved as a regular Python object**. For example, take this function:
+**Object IDs** 也可以传递给远程函数。当函数实际上被执行时，**参数将被检索为常规Python对象**。例如，使用此功能：
 
 .. code:: python
 
@@ -90,19 +84,12 @@ See the `ray.remote package reference <package-ref.html>`__ page for specific do
     assert ray.get(chained_id) == 2
 
 
-Note the following behaviors:
+请注意以下行为：
 
-  -  The second task will not be executed until the first task has finished
-     executing because the second task depends on the output of the first task.
-  -  If the two tasks are scheduled on different machines, the output of the
-     first task (the value corresponding to ``x1_id``) will be sent over the
-     network to the machine where the second task is scheduled.
-
-Oftentimes, you may want to specify a task's resource requirements (for example
-one task may require a GPU). The ``ray.init()`` command will automatically
-detect the available GPUs and CPUs on the machine. However, you can override
-this default behavior by passing in specific resources, e.g.,
-``ray.init(num_cpus=8, num_gpus=4, resources={'Custom': 2})``.
+  - 在第一个任务执行完成以前，第二个任务将不会被执行，因为第二个任务取决于第一个任务的输出。
+  - 如果在不同的机器上安排两个任务，则第一个任务的输出（对应的值 ``x1_id``）将通过网络发送到第二个任务的机器。
+  
+经常地，您可能希望指定任务的资源需求（例如，一个任务可能需要GPU）。``ray.init()`` 命令可能会自动检测到可用的机器上的GPU和CPU。然而，你可以使用传递一些特定资源参数重写这个默认项，例如``ray.init(num_cpus=8, num_gpus=4, resources={'Custom': 2})``.
 
 To specify a task's CPU and GPU requirements, pass the ``num_cpus`` and
 ``num_gpus`` arguments into the remote decorator. The task will only run on a
@@ -156,19 +143,16 @@ Further, remote function can return multiple object IDs.
   a_id, b_id, c_id = return_multiple.remote()
 
 
-Objects in Ray
+Ray里的对象
 --------------
 
-In Ray, we can create and compute on objects. We refer to these objects as **remote objects**, and we use **object IDs** to refer to them. Remote objects are stored in **object stores**, and there is one object store per node in the cluster. In the cluster setting, we may not actually know which machine each object lives on.
+在Ray里，我们可以创建并在对象上计算。我们将这些对象称为**远程对象（remote objects）**，然后我们使用**object IDs**去指向他们。远程对象被存储在**对象库（object stores）**,集群的每个节点都有个对象库。在集群设置中，我们可能无法确切地知道每个对象是在哪个机器上运行的。一个 **object ID** 本质上是可以用来指代一个远程对象的一个唯一的ID。如果你熟悉期货，我们的object IDs在概念上是相似的。
 
-An **object ID** is essentially a unique ID that can be used to refer to a
-remote object. If you're familiar with futures, our object IDs are conceptually
-similar.
 
-Object IDs can be created in multiple ways.
+可以通过多种方式创建Object ID。
 
-  1. They are returned by remote function calls.
-  2. They are returned by ``ray.put``.
+  1.它们由远程函数调用返回。
+  2. 他们由``ray.put``返回。
 
 .. code-block:: python
 
@@ -179,19 +163,14 @@ Object IDs can be created in multiple ways.
     :noindex:
 
 
-.. important::
+.. 重点::
 
-    Remote objects are immutable. That is, their values cannot be changed after
-    creation. This allows remote objects to be replicated in multiple object
-    stores without needing to synchronize the copies.
+    远程对象是不可变的。也就是说，它们的值在创建后无法更改。这允许远程对象在多个对象库中进行复制，而无需同步副本。
 
-
-Fetching Results
+获取结果
 ----------------
 
-The command ``ray.get(x_id)`` takes an object ID and creates a Python object
-from the corresponding remote object. For some objects like arrays, we can use
-shared memory and avoid copying the object.
+命令 ``ray.get(x_id)`` 获取object ID然后从对应的远程对象创建一个Python对象。对于数据这样的对象，我们可以使用共享内存来避免复制对象。
 
 .. code-block:: python
 
@@ -203,9 +182,7 @@ shared memory and avoid copying the object.
     :noindex:
 
 
-After launching a number of tasks, you may want to know which ones have
-finished executing. This can be done with ``ray.wait``. The function
-works as follows.
+在启动一系列任务后，你也许想知道哪些执行完成了。这个可以由 ``ray.wait`` 完成。这个函数是如下工作的：
 
 .. code:: python
 
@@ -215,13 +192,10 @@ works as follows.
     :noindex:
 
 
-Remote Classes (Actors)
+远程类 (Actors)
 -----------------------
 
-Actors extend the Ray API from functions (tasks) to classes. The ``ray.remote``
-decorator indicates that instances of the ``Counter`` class will be actors. An
-actor is essentially a stateful worker. Each actor runs in its own Python
-process.
+Actors 将Ray API从函数扩展到对象。这个``ray.remote``的装饰器表示 ``Counter``类将会成为actor。一个actor本质上是一个有状态worker，每个actor在他们自己的Python进程上运行。
 
 .. code-block:: python
 
@@ -234,20 +208,20 @@ process.
           self.value += 1
           return self.value
 
-To create a couple actors, we can instantiate this class as follows:
+为了创建几个actor，我们可以按下列方法初始化这个类
 
 .. code-block:: python
 
   a1 = Counter.remote()
   a2 = Counter.remote()
 
-When an actor is instantiated, the following events happen.
+实例化actor时，会发生以下事件。
 
-1. A worker Python process is started on a node of the cluster.
-2. A ``Counter`` object is instantiated on that worker.
+1. 在集群的一个节点上启动一个Python worker进程。
+2. 在该worker上实例化一个 ``Counter`` 对象.
 
-You can specify resource requirements in Actors too (see the `Actors section
-<actors.html>`__ for more details.)
+您也可以在Actors中指定资源需求 (有关更多详细信息 请参阅`Actors部分 '
+<actors.html>`__ )
 
 .. code-block:: python
 
@@ -255,9 +229,7 @@ You can specify resource requirements in Actors too (see the `Actors section
   class Actor(object):
       pass
 
-We can interact with the actor by calling its methods with the ``.remote``
-operator. We can then call ``ray.get`` on the object ID to retrieve the actual
-value.
+我们可以通过使用 ``.remote`` 运算符调用其方法来与actor进行交互。然后我们可以调用 ``ray.get`` 对象ID来检索实际的值。
 
 .. code-block:: python
 
@@ -265,7 +237,8 @@ value.
   ray.get(obj_id) == 1
 
 
-Methods called on different actors can execute in parallel, and methods called on the same actor are executed serially in the order that they are called. Methods on the same actor will share state with one another, as shown below.
+
+调用在不同的actors的方法可以被并行执行，相同actor的方法调用会根据调用顺序连续执行。相同actor上的方法和其他的方法会彼此共享状态，如下所示：
 
 .. code-block:: python
 
@@ -282,5 +255,5 @@ Methods called on different actors can execute in parallel, and methods called o
   results = ray.get([counters[0].increment.remote() for _ in range(5)])
   print(results)  # prints [2, 3, 4, 5, 6]
 
-
-To learn more about Ray Actors, see the `Actors section <actors.html>`__.
+ 
+要了解更多有关ray actors的信息，请参阅 `Actors section <actors.html>`__.
