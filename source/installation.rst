@@ -58,6 +58,7 @@ Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已
 .. _`Anaconda`: https://www.continuum.io/downloads
 
 对于Ubuntu，可以运行下列命令：
+
 .. code-block:: bash
 
   sudo apt-get update
@@ -80,6 +81,7 @@ Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已
 
 
 如果你正在使用Anaconda，你也许同时需要下列：
+
 .. code-block:: bash
 
   conda install libgcc
@@ -88,6 +90,7 @@ Ray 支持Python 2 和Python 3，支持在MacOS、Linux，Windows运行支持已
 ~~~~~~~~~~~
 
 Ray也可以从源包中编译，如下。
+
 .. code-block:: bash
 
   git clone https://github.com/ray-project/ray.git
@@ -103,15 +106,16 @@ Docker源镜像
 --------------------
 
 运行脚本创建Docker镜像
+
 .. code-block:: bash
 
   cd ray
   ./build-docker.sh
 
-This script creates several Docker images:
+
 这个脚本创建了几个Docker镜像
 - ``ray-project/deploy``镜像是一个源码和安装文件完备的拷贝，适合终端用户。
-- The ``ray-project/examples`` 添加了附加的文件去运行示例。
+- ``ray-project/examples`` 添加了附加的文件去运行示例。
 - ``ray-project/base-deps`` 镜像是为了Ubuntu Xenial创建的，包含了Anaconda和其他的基础依赖，开发者可以以此为基础开始开发。
 
 可以列出镜像从而查看：
@@ -122,6 +126,7 @@ This script creates several Docker images:
 
 
 输出看起来应该像如下所示：
+
 .. code-block:: bash
 
   REPOSITORY                          TAG                 IMAGE ID            CREATED             SIZE
@@ -137,6 +142,7 @@ This script creates several Docker images:
 
 
 开始从运行环境创建container.
+
 .. code-block:: bash
 
   docker run --shm-size=<shm-size> -t -i ray-project/deploy
@@ -158,6 +164,7 @@ Test if the installation succeeded
 
 
 为了测试安装成功了，可以尝试运行一些试验，这里假设你已克隆了git资源库。
+
 .. code-block:: bash
 
   python -m pytest -v python/ray/tests/test_mini.py
