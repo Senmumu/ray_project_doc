@@ -108,6 +108,7 @@ Ray支持任意Python函数异步执行。这些异步的Ray函数被称为"远�
 一个task的资源需求对Ray的调度并发性是有影响的。特别的，在一个节点上，所有正在执行的任务的总资源需求不能超过这个节点的总资源。
 
 如下有更多的资源指定的示例
+
 .. code-block:: python
 
   # Ray 也支持很小的部分的资源需求
@@ -120,8 +121,8 @@ Ray支持任意Python函数异步执行。这些异步的Ray函数被称为"远�
   def f():
       return 1
 
-Further, remote function can return multiple object IDs.
-此外，远程函数可以返回多个对象ID
+此外，远程函数可以返回多个对象ID:
+
 .. code-block:: python
 
   @ray.remote(num_return_vals=3)
