@@ -1,4 +1,4 @@
-Tune: Scalable Hyperparameter Tuning
+调节模块: 可扩展的参数调节
 ====================================
 
 .. image:: images/tune.png

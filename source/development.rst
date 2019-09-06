@@ -1,47 +1,41 @@
-Development Tips
+开发小提示
 ================
 
-Compilation
+编译
 -----------
 
-To speed up compilation, be sure to install Ray with
+要加快编译速度，请务必通过如下方式安装Ray：
 
 .. code-block:: shell
 
  cd ray/python
  pip install -e . --verbose
 
-The ``-e`` means "editable", so changes you make to files in the Ray
-directory will take effect without reinstalling the package. In contrast, if
-you do ``python setup.py install``, files will be copied from the Ray
-directory to a directory of Python packages (often something like
-``/home/ubuntu/anaconda3/lib/python3.6/site-packages/ray``). This means that
-changes you make to files in the Ray directory will not have any effect.
+``-e`` 意思是可编辑，因此你对文件的更改将在不重新安装包的情况下生效。相反，如果你使用``python setup.py install``，文件将从Ray的目录复制到Python的目录（通常像是 ``/home/ubuntu/anaconda3/lib/python3.6/site-packages/ray``），这意味着你对文件的更改不会起任何作用。
+如果你运行 ``pip install`` 的时候遇到 **Permission Denied** 你可以尝试添加 ``--user`` 。你可能也需要运行一些命令，像 ``sudo
+chown -R $USER /home/ubuntu/anaconda3`` （代之以适当的路径）
 
-If you run into **Permission Denied** errors when running ``pip install``,
-you can try adding ``--user``. You may also need to run something like ``sudo
-chown -R $USER /home/ubuntu/anaconda3`` (substituting in the appropriate
-path).
 
-If you make changes to the C++ files, you will need to recompile them.
-However, you do not need to rerun ``pip install -e .``. Instead, you can
-recompile much more quickly by doing
+如果你修改了C++文件，你可能需要重新编译它们。不过，你不需要重新运行 ``pip install -e .``。
+替代的是，你可以用以下的办法更快地重新编译：
 
 .. code-block:: shell
 
  cd ray
  bazel build //:ray_pkg
 
-This command is not enough to recompile all C++ unit tests. To do so, see
-`Testing locally`_.
+这个命令还不足以重新编译所有的C++ unit tests.如果要这么做，查看：
 
-Debugging
+`本地测试`_.
+
+调试
 ---------
 
-Starting processes in a debugger
+在调试器里启动进程
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When processes are crashing, it is often useful to start them in a debugger.
-Ray currently allows processes to be started in the following:
+
+当进程崩溃时，在调试器里重新运行往往会有效。
+Ray当前允许进程如下启动：
 
 - valgrind
 - the valgrind profiler
@@ -55,6 +49,10 @@ Then, you can launch a subset of ray processes by adding the environment
 variable ``RAY_{PROCESS_NAME}_{DEBUGGER}=1``. For instance, if you wanted to
 start the raylet in ``valgrind``, then you simply need to set the environment
 variable ``RAY_RAYLET_VALGRIND=1``.
+
+使用任一个工具，请确定你将他们在你的机器上安装好（MacOS上的``gdb`` 和 ``valgrind``众所周知是有一定问题的）
+然后，你可以通过添加环境参数 ``RAY_{PROCESS_NAME}_{DEBUGGER}=1`` 启动ray的子进程，针对实例，如果你想去启动一个
+raylet
 
 To start a process inside of ``gdb``, the process must also be started inside of
 ``tmux``. So if you want to start the raylet in ``gdb``, you would start your
@@ -131,43 +129,35 @@ starting Ray. For example, you can do:
 
 This will print any ``RAY_LOG(DEBUG)`` lines in the source code to the
 ``raylet.err`` file, which you can find in the `Temporary Files`_.
+这会打印出``RAY_LOG(DEBUG)``源码中的所有行到 ，你可以在`临时文件`_.
 
-Testing locally
+本地测试
 ---------------
-Suppose that one of the tests (e.g., ``test_basic.py``) is failing. You can run
-that test locally by running ``python -m pytest -v python/ray/tests/test_basic.py``. However, doing so will run all of the tests which can take a while. To run a specific test that is
-failing, you can do
+假设其中一个测试（例如 ``test_basic.py`` ） 失败了。您可以在本地运行  ``python -m pytest -v python/ray/tests/test_basic.py`` 。但是，这样做会运行所有的测试，可能需要一段时间。要运行失败的特定测试，您可以执行此操作：
 
 .. code-block:: shell
 
  cd ray
  python -m pytest -v python/ray/tests/test_basic.py::test_keyword_args
 
-When running tests, usually only the first test failure matters. A single
-test failure often triggers the failure of subsequent tests in the same
-script.
+当运行测试时，通常第一个的测试失败是重要的，单一个测试失败通常导致同一脚本的后续测试失败。
 
-To compile and run all C++ tests, you can run:
-
+为了编译运行C++脚本，你可以运行
 .. code-block:: shell
 
  cd ray
  bazel test $(bazel query 'kind(cc_test, ...)')
 
 
-Linting
+语言分析
 -------
 
 **Running linter locally:** To run the Python linter on a specific file, run
 something like ``flake8 ray/python/ray/worker.py``. You may need to first run
 ``pip install flake8``.
-
-**Autoformatting code**. We use `yapf <https://github.com/google/yapf>`_ for
-linting, and the config file is located at ``.style.yapf``. We recommend
-running ``scripts/yapf.sh`` prior to pushing to format changed files.
-Note that some projects such as dataframes and rllib are currently excluded.
-
-
+****
+**在本地运行linter**: 若需要在特定文件上运行Python linter，请执行如 ``flake8 ray/python/ray/worker.py`` 类似的操作。你需要首先运行 ``pip install flake8``。
+**自动格式化代码** 我们使用yapf 运行 linting， 配置文件位于 ``.style.yapf``。我们建议在格式化更改后的文件之前运行 ``scripts/yapf.sh``。注意有些项目如dataframes和rllib现在是不包含的。
 
 .. _`issues`: https://github.com/ray-project/ray/issues
 .. _`Temporary Files`: http://ray.readthedocs.io/en/latest/tempfile.html
